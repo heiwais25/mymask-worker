@@ -22,7 +22,9 @@ export default {
   },
   bull: {
     host: process.env.BULL_HOST || "127.0.0.1",
-    port: parseInt(process.env.BULL_PORT || "6379")
+    port: parseInt(process.env.BULL_PORT || "6379"),
+    attempts: parseInt(process.env.BULL_ATTEMPTS || "5"),
+    backoff: parseInt(process.env.BULL_BACKOFF || "5000")
   },
   clickCountTimeRange: "120m",
   latestStockAtRange: "7d",
