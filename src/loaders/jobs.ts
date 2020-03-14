@@ -14,5 +14,8 @@ export default ({ regularFetchQueue }: IBullSets) => {
   });
 
   // Description in here https://cronexpressiondescriptor.azurewebsites.net/?expression=0+*%2F5+6-22+%3F+*+*&locale=en
-  regularFetchQueue.queue.add({}, { repeat: { cron: "0 */5 6-22 ? * *" } });
+  regularFetchQueue.queue.add(
+    {},
+    { attempts: 5, backoff: 5000, repeat: { cron: "0 */5 6-22 ? * *" } }
+  );
 };
