@@ -32,7 +32,7 @@ export type IStore = {
   distance: number;
   remain_stat: IRemainStat;
   latest_click_counts: number;
-  latest_stock_ats: string[];
+  latest_stock_ats: { plenty?: Date; empty?: Date }[];
 };
 
 export type StoreResponseData = {

@@ -26,8 +26,8 @@ export default {
     attempts: parseInt(process.env.BULL_ATTEMPTS || "5"),
     backoff: parseInt(process.env.BULL_BACKOFF || "5000")
   },
-  clickCountTimeRange: "120m",
-  latestStockAtRange: "7d",
+  clickCountTimeRange: process.env.LATEST_CLICK_COUNT_RANGE || "120m",
+  latestRemainStatsRange: process.env.LATEST_REMAIN_STAT_RANGE || "7d",
 
   fetchDistance: parseInt(process.env.FETCH_DISTANCE || "5000"),
   fetchBatchSize: parseInt(process.env.FETCH_BATCH || "100")

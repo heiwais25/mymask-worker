@@ -19,6 +19,9 @@ import {
 } from "../utils/influxdb";
 import { mgetObjectAsync, msetAsyncObject, mgeoAddAsyncObject } from "../utils/redis";
 import logger from "../loaders/logger";
+import { getUTCFormatDate } from "../utils/date";
+import moment from "moment-timezone";
+import { LatestEmptyStatsResult, getLatestEmptyStatsQuery } from "../utils/influxdb";
 
 @Service()
 export class StoreTrackerService {
@@ -121,18 +124,40 @@ export class StoreTrackerService {
     }
 
     // Prepare old datas
-    const clickCountsByCode = (await influx.query<ClickCountQueryResult>(getClickCountQuery())).map(
-      queryResult => ({
-        [queryResult.code]: queryResult
-      })
+    let clickCountsByCode: { [key: string]: number } = {};
+    const countQueryResults = await influx.query<ClickCountQueryResult>(getClickCountQuery());
+    countQueryResults.forEach(item => {
+      clickCountsByCode[item.code] = item.count_stockAt;
+    });
+
+    let latestStockAtsByCode: { [key: string]: { plenty?: Date; empty?: Date }[] } = {};
+    const latestStockAtsResults = await influx.query<LatestStockAtsResult>(
+      getLatestStockAtsQuery()
     );
-    const latestStockAtsByCode = (
-      await influx.query<LatestStockAtsResult>(getLatestStockAtsQuery())
-    )
-      .groups()
-      .map(queryResult => ({
-        [queryResult.tags["code"]]: queryResult.rows.map(item => item.stockAt)
+
+    // Row stock at is not formatted as a UTC, so we need to convert to make sure timezone
+    latestStockAtsResults.groups().forEach(item => {
+      latestStockAtsByCode[item.tags["code"]] = item.rows.map(el => ({
+        plenty: new Date(getUTCFormatDate(el.stockAt))
       }));
+    });
+
+    const emptyStatsResults = await influx.query<LatestEmptyStatsResult>(
+      getLatestEmptyStatsQuery()
+    );
+
+    // Fill plenty and empty to each date
+    emptyStatsResults.groups().forEach(item => {
+      const stockLogs = latestStockAtsByCode[item.tags["code"]];
+      item.rows.forEach(row => {
+        const rowMoment = moment.tz(row.time, "Asia/Seoul");
+        stockLogs.forEach(stock => {
+          if (moment.tz(stock.plenty, "Asia/Seoul").date() === rowMoment.date() && !stock.empty) {
+            stock.empty = rowMoment.toDate();
+          }
+        });
+      });
+    });
 
     return {
       oldStoresByCode,

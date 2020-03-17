@@ -1,6 +1,6 @@
-import { IStore } from "../maps";
-import { MEASUREMENT_REQUEST_AGENT, MEASUREMENT_STOCK_AT } from "../constants";
+import { MEASUREMENT_REMAIN_STAT, MEASUREMENT_STOCK_AT } from "../constants";
 import configs from "../configs";
+import { IRemainStat } from "../services/sectionStateService";
 
 export type ClickCountQueryResult = {
   time: Date;
@@ -13,24 +13,26 @@ export const getClickCountQuery = () => `
     WHERE time > now() - ${configs.clickCountTimeRange} GROUP BY "code";
 `;
 
-// export const getClickCountQuery = (store: IStore) => `
-//     SELECT COUNT(*) FROM ${MEASUREMENT_REQUEST_AGENT}
-//     WHERE "code" = '${store.code}' AND time > now() - ${configs.clickCountTimeRange};
-// `;
-
 export type LatestStockAtsResult = {
   time: Date;
   stockAt: string;
   code: string;
 };
 
-// export const getLatestStockAtsQuery = (store: IStore) => `
-//     SELECT COUNT(*) FROM ${MEASUREMENT_STOCK_AT}
-//     WHERE "code" = '${store.code}' AND time > now() - ${configs.latestStockAtRange};
-// `;
-
 export const getLatestStockAtsQuery = () => `
     SELECT * FROM ${MEASUREMENT_STOCK_AT} 
-    WHERE time > now() - ${configs.latestStockAtRange} 
+    WHERE time > now() - ${configs.latestRemainStatsRange} 
+    GROUP BY "code";
+`;
+
+export type LatestEmptyStatsResult = {
+  time: Date;
+  remainStat: IRemainStat;
+  code: string;
+};
+
+export const getLatestEmptyStatsQuery = () => `
+    SELECT * FROM ${MEASUREMENT_REMAIN_STAT} 
+    WHERE remainStat='empty' AND time > now() - ${configs.latestRemainStatsRange} 
     GROUP BY "code";
 `;
