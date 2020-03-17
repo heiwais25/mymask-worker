@@ -1,6 +1,7 @@
 import { Application } from "express";
 import logger from "morgan";
 import cors from "cors";
+import api from "../api";
 
 export default (express: Application) => {
   express.use(cors());
@@ -11,4 +12,6 @@ export default (express: Application) => {
 
   express.get("/status", (_, res) => res.status(200).send());
   express.post("/status", (_, res) => res.status(200).send());
+
+  express.use("/api", api);
 };

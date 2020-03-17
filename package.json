@@ -40,7 +40,7 @@
   },
   "scripts": {
     "dev": "nodemon  --exec ts-node --files src/app.ts",
-    "start": "ts-node --files src/app.ts",
+    "start": "NODE_ENV=production ts-node --files src/app.ts",
     "build": "webpack --config webpack.config.js"
   }
 }

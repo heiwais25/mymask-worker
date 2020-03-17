@@ -103,6 +103,8 @@ export class StoreTrackerService {
         rawStores.length
       } | Time : ${new Date().getTime() - start}ms`
     );
+
+    return newStores;
   }
 
   private async getStoreLogs(stores: IRawStore[]) {
