@@ -23,43 +23,42 @@ export const getMeasurementName = (key: IStoreLogTarget) => {
 export default async () => {
   logger.info(`💁  Run Influx on ${configs.influxdb.host}:${configs.influxdb.port}`);
 
-  const influx = new Influx.InfluxDB({
-    host: configs.influxdb.host,
-    port: configs.influxdb.port,
-    database: INFLUX_DB_NAME,
-    schema: [
-      {
-        measurement: MEASUREMENT_REMAIN_STAT,
-        fields: {
-          remainStat: Influx.FieldType.STRING
-        },
-        tags: ["code"]
-      },
-      {
-        measurement: MEASUREMENT_STOCK_AT,
-        fields: {
-          stockAt: Influx.FieldType.STRING
-        },
-        tags: ["code"]
-      },
-      {
-        measurement: MEASUREMENT_REQUEST_AGENT,
-        fields: {
-          requestAgent: Influx.FieldType.STRING
-        },
-        tags: ["code"]
-      }
-    ]
-  });
   try {
+    const influx = new Influx.InfluxDB({
+      host: configs.influxdb.host,
+      port: configs.influxdb.port,
+      database: INFLUX_DB_NAME,
+      schema: [
+        {
+          measurement: MEASUREMENT_REMAIN_STAT,
+          fields: {
+            remainStat: Influx.FieldType.STRING
+          },
+          tags: ["code"]
+        },
+        {
+          measurement: MEASUREMENT_STOCK_AT,
+          fields: {
+            stockAt: Influx.FieldType.STRING
+          },
+          tags: ["code"]
+        },
+        {
+          measurement: MEASUREMENT_REQUEST_AGENT,
+          fields: {
+            requestAgent: Influx.FieldType.STRING
+          },
+          tags: ["code"]
+        }
+      ]
+    });
     const databases = await influx.getDatabaseNames();
     if (!databases.includes(INFLUX_DB_NAME)) {
       await influx.createDatabase(INFLUX_DB_NAME);
     }
+    return influx;
   } catch (e) {
     logger.error("⛈  Error on dependency injectory : %o", e);
     throw e;
   }
-
-  return influx;
 };

@@ -18,3 +18,5 @@ export const TYPEDI_INFLUX_KEY = "TYPEDI_INFLUX_KEY";
 
 export const SCAN_START_LATLANG: ILatLng = { lat: 38.611111, lng: 124.61 };
 export const SCAN_END_LATLANG: ILatLng = { lat: 33.111944, lng: 131.872778 };
+
+export const REDIS_MAX_CONNECTION_TIMEOUT = 60000;

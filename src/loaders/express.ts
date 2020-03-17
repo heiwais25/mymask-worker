@@ -1,15 +1,14 @@
-import { Express, Application } from "express";
+import { Application } from "express";
 import logger from "morgan";
 import cors from "cors";
-// import api from "../api";
-// import { uploadMiddleware, uploadController } from "../rest/upload";
 
 export default (express: Application) => {
   express.use(cors());
-  express.use(logger("dev"));
 
-  // Set server response
+  if (process.env.NODE_ENV === "development") {
+    express.use(logger("dev"));
+  }
 
-  //   express.use("/api", api);
-  // Set uploader
+  express.get("/status", (_, res) => res.status(200).send());
+  express.post("/status", (_, res) => res.status(200).send());
 };
