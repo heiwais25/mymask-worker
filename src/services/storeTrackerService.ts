@@ -77,6 +77,7 @@ export class StoreTrackerService {
     // Get influxPoints to update (stockAt, remainStat)
     const influxPoints: IPoint[] = [];
     const measurements: IStoreLogTarget[] = ["stock_at", "remain_stat"];
+
     newStores.forEach(newStore => {
       const oldStore = oldStoresByCode[newStore.code];
       measurements.forEach(key => {
@@ -128,8 +129,8 @@ export class StoreTrackerService {
     // Prepare old datas
     let clickCountsByCode: { [key: string]: number } = {};
     const countQueryResults = await influx.query<ClickCountQueryResult>(getClickCountQuery());
-    countQueryResults.forEach(item => {
-      clickCountsByCode[item.code] = item.count_stockAt;
+    countQueryResults.groups().forEach(item => {
+      clickCountsByCode[item.tags["code"]] = item.rows[0].count_requestAgent;
     });
 
     let latestStockAtsByCode: { [key: string]: { plenty?: Date; empty?: Date }[] } = {};
@@ -151,14 +152,16 @@ export class StoreTrackerService {
     // Fill plenty and empty to each date
     emptyStatsResults.groups().forEach(item => {
       const stockLogs = latestStockAtsByCode[item.tags["code"]];
-      item.rows.forEach(row => {
-        const rowMoment = moment.tz(row.time, "Asia/Seoul");
-        stockLogs.forEach(stock => {
-          if (moment.tz(stock.plenty, "Asia/Seoul").date() === rowMoment.date() && !stock.empty) {
-            stock.empty = rowMoment.toDate();
-          }
+      if (stockLogs && stockLogs.length > 0) {
+        item.rows.forEach(row => {
+          const rowMoment = moment.tz(row.time, "Asia/Seoul");
+          stockLogs.forEach(stock => {
+            if (moment.tz(stock.plenty, "Asia/Seoul").date() === rowMoment.date() && !stock.empty) {
+              stock.empty = rowMoment.toDate();
+            }
+          });
         });
-      });
+      }
     });
 
     return {

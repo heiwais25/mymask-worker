@@ -1,15 +1,19 @@
-import { MEASUREMENT_REMAIN_STAT, MEASUREMENT_STOCK_AT } from "../constants";
+import {
+  MEASUREMENT_REMAIN_STAT,
+  MEASUREMENT_STOCK_AT,
+  MEASUREMENT_REQUEST_AGENT
+} from "../constants";
 import configs from "../configs";
 import { IRemainStat } from "../services/sectionStateService";
 
 export type ClickCountQueryResult = {
   time: Date;
-  count_stockAt: number; // TODO : CHANGE IT TO PROPER REQUEST AGENT
+  count_requestAgent: number; // TODO : CHANGE IT TO PROPER REQUEST AGENT
   code: string;
 };
 
 export const getClickCountQuery = () => `
-    SELECT COUNT(*) FROM ${MEASUREMENT_STOCK_AT} 
+    SELECT COUNT(*) FROM ${MEASUREMENT_REQUEST_AGENT} 
     WHERE time > now() - ${configs.clickCountTimeRange} GROUP BY "code";
 `;
 
