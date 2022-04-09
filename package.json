@@ -15,7 +15,7 @@
     "ioredis": "^4.16.0",
     "lodash": "^4.17.15",
     "log4js": "^6.1.2",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "moment-timezone": "^0.5.28",
     "morgan": "^1.9.1",
     "redis": "^3.0.2",
